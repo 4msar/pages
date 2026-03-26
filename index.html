@@ -21,7 +21,7 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const siteName = document.getElementById("site-name");
-                siteName.innerText = window.location.hostname;
+                siteName.innerText = window.location.hostname.split(".")[0];
             });
         </script>
     </head>
