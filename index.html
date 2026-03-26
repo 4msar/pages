@@ -1,88 +1,110 @@
 <!doctype html>
-<html lang="en-us">
-
+<html lang="en">
     <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <!-- Meta -->
-        <meta charset="utf-8">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
-        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <!-- Page Title -->
+        <title>Hello | rasm.fyi</title>
 
-        <title>Saiful Alam</title>
-        <meta name="description" content="Software Engineer">
+        <!-- Description for SEO -->
+        <meta name="description" content="Welcome to the world of variation!" />
 
-        <!-- The compiled CSS file -->
-        <link rel="stylesheet" href="css/production.css">
+        <!-- Keywords for SEO (optional but can help) -->
+        <meta name="keywords" content="Hello, Welcome, Random, Variation" />
 
-        <!-- Web fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,700|Source+Serif+Pro:700" rel="stylesheet"> 
+        <!-- Author -->
+        <meta name="author" content="rasm.fyi" />
 
-        <!-- favicon.ico. Place these in the root directory. -->
-        <link rel="shortcut icon" href="//msar.me/favicon.ico">
+        <!-- Social Media / Open Graph tags -->
+        <meta property="og:title" content="Hello" />
+        <meta property="og:description" content="Welcome to the world of variation!" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://rasm.fyi/" />
+
+        <!-- Twitter Card tags -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Hello" />
+        <meta name="twitter:description" content="Welcome to the world of variation!" />
+
+        <!-- Favicon -->
+        <link rel="icon" type="image/png" href="/favicon.ico" />
+
+        <!-- SEO / Open Graph Image -->
+        <meta property="og:image" content="/image.png" />
+        <meta property="twitter:image" content="/image.png" />
+
+        <!-- Google Fonts: Monospace -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Train+One&display=swap"
+            rel="stylesheet"
+        />
 
         <style>
             body {
-                height: 100%;
-                min-height: 100vh;
+                margin: 0;
+                padding: 0;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
+                align-items: center;
+                height: 100vh;
+                font-family: "Train One", system-ui;
+                font-weight: 400;
+                font-style: normal;
+                background-color: #f0f0f0;
+                color: #333;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: clamp(4rem, 40vw, 20vw);
+                margin: 0.2em 0;
+                line-height: 1;
+            }
+
+            h2 {
+                font-size: clamp(2rem, 8vw, 4rem);
+                margin: 0;
+                color: #555;
+
+                font-family: "Doto", sans-serif;
+                font-optical-sizing: auto;
+                font-weight: 600;
+                font-style: normal;
+                font-variation-settings: "ROND" 0;
             }
         </style>
-
     </head>
+    <body>
+        <h1>Hello</h1>
+        <h2 id="date"></h2>
 
-    <body class="has-animations">
+        <script>
+            const dateElement = document.getElementById("date");
+            const options = {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true,
+            };
 
-
-    <!-- Header -->
-    <header class="align--center pt3">
-        <div class="container--lg border--bottom pb3">
-            <h1 class="mb2">Saiful Alam</h1>
-            <img class="logo mb3 reveal-on-scroll is-revealing" src="/img/logo-pure.svg" alt="Saiful Alam">
-            <h1 class="mb2">A Passionate Software Engineer.</h1>
-        </div>
-    </header>
-
-    <main style="display: none;">
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="pt1 pb3 align--center-on-mobile">
-        <div class="container">
-            <div class="grid-row">
-                <div class="grid-column mt2 span-half">
-                    <p class="small">
-                        <a href="./privacy-policy.html" class="link mr1 link--text">Privacy Policy</a>
-                        <a href="./terms.html" class="link mr1 link--text">Terms of Service</a>
-                    </p>
-                </div>
-                <div class="grid-column mt2 span-half align--right align--center-on-mobile">
-                    <ul class="no-bullets list--inline">
-                        <li class="mr1"><a href="//fb.com/4msar" class="link"><img class="icon" src="/img/twitter.svg" alt="Twitter"></a></li>
-                        <li><a href="//twitter.com/4msar" class="link"><img class="icon" src="/img/facebook.svg" alt="Facebook"></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scroll reveal -->
-    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
-
-    <!-- The compiled JavaScript file -->
-    <script src="js/production.js"></script>
-    <script>
-        const _feature = document.querySelector('#feature');
-        if( _feature ){
-            const queryParams = new URLSearchParams(window.location.search);
-            if( queryParams.has('portfolio') ){
-                _feature.style.removeProperty('display');
+            function renderDate() {
+                const now = new Date();
+                dateElement.textContent = now.toLocaleDateString(undefined, options);
             }
-        }
-    </script>
 
+            // Immediate render
+            renderDate();
+
+            // Update on every minute
+            const now = new Date();
+            setInterval(renderDate, 60000);
+        </script>
     </body>
 </html>
-
