@@ -1,110 +1,67 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-        <!-- Page Title -->
-        <title>Hello | rasm.fyi</title>
-
-        <!-- Description for SEO -->
-        <meta name="description" content="Welcome to the world of variation!" />
-
-        <!-- Keywords for SEO (optional but can help) -->
-        <meta name="keywords" content="Hello, Welcome, Random, Variation" />
-
-        <!-- Author -->
-        <meta name="author" content="rasm.fyi" />
-
-        <!-- Social Media / Open Graph tags -->
-        <meta property="og:title" content="Hello" />
-        <meta property="og:description" content="Welcome to the world of variation!" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://rasm.fyi/" />
-
-        <!-- Twitter Card tags -->
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Hello" />
-        <meta name="twitter:description" content="Welcome to the world of variation!" />
-
-        <!-- Favicon -->
-        <link rel="icon" type="image/png" href="/favicon.ico" />
-
-        <!-- SEO / Open Graph Image -->
-        <meta property="og:image" content="/image.png" />
-        <meta property="twitter:image" content="/image.png" />
-
-        <!-- Google Fonts: Monospace -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Train+One&display=swap"
-            rel="stylesheet"
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Coming Soon</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="We're working on something awesome!"
         />
+        <meta
+            name="keywords"
+            content="coming soon, under construction, maintenance, website"
+        />
+        <meta name="author" content="Saiful Alam" />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#000000" />
 
-        <style>
-            body {
-                margin: 0;
-                padding: 0;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                font-family: "Train One", system-ui;
-                font-weight: 400;
-                font-style: normal;
-                background-color: #f0f0f0;
-                color: #333;
-                text-align: center;
-            }
-
-            h1 {
-                font-size: clamp(4rem, 40vw, 20vw);
-                margin: 0.2em 0;
-                line-height: 1;
-            }
-
-            h2 {
-                font-size: clamp(2rem, 8vw, 4rem);
-                margin: 0;
-                color: #555;
-
-                font-family: "Doto", sans-serif;
-                font-optical-sizing: auto;
-                font-weight: 600;
-                font-style: normal;
-                font-variation-settings: "ROND" 0;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Hello</h1>
-        <h2 id="date"></h2>
-
+        <link rel="icon" type="image/png" href="/favicon.ico" />
+        <script src="https://cdn.tailwindcss.com"></script>
         <script>
-            const dateElement = document.getElementById("date");
-            const options = {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true,
-            };
-
-            function renderDate() {
-                const now = new Date();
-                dateElement.textContent = now.toLocaleDateString(undefined, options);
-            }
-
-            // Immediate render
-            renderDate();
-
-            // Update on every minute
-            const now = new Date();
-            setInterval(renderDate, 60000);
+            document.addEventListener("DOMContentLoaded", function () {
+                const siteName = document.getElementById("site-name");
+                siteName.innerText = window.location.hostname;
+            });
         </script>
+    </head>
+    <body
+        class="min-h-screen m-0 p-0 flex flex-col items-center justify-center text-center bg-no-repeat bg-cover bg-gray-900 overflow-hidden"
+        style="background-image: url(https://picsum.photos/1400/720?nature)"
+    >
+        <div
+            class="bg-gray-900 bg-opacity-80 py-4 px-4 sm:py-20 sm:px-24 sm:rounded-lg flex flex-col items-center justify-center text-center"
+        >
+            <div class="text-white">
+                <h1 class="text-6xl font-bold mb-8" id="site-name">Hello</h1>
+                <h2 class="text-4xl font-semibold">Coming Soon</h2>
+                <p class="mt-2 text-lg">We're working on something awesome!</p>
+            </div>
+
+            <div class="mt-8">
+                <form
+                    method="post"
+                    action="#"
+                    class="flex items-center sm:flex-row flex-col"
+                >
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        class="py-2 px-4 bg-gray-800 text-white rounded-t-md sm:rounded-l-md focus:outline-none w-full sm:w-auto"
+                        required
+                    />
+                    <button
+                        type="submit"
+                        class="bg-blue-500 py-2 px-4 text-white w-full sm:w-auto rounded-b-md sm:rounded-r-md hover:bg-blue-600 focus:outline-none"
+                    >
+                        Subscribe
+                    </button>
+                </form>
+                <p class="mt-2 text-gray-400 text-sm">
+                    Be the first to know when we launch!
+                </p>
+            </div>
+        </div>
     </body>
 </html>
