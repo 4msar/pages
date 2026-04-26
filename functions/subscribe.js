@@ -38,9 +38,9 @@ export async function onRequestPost(context) {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    name: "Email subscription",
+                    name: "Email subscription : " + email,
                     type: host,
-                    value: email,
+                    value: {email},
                 }),
             },
         );
