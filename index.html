@@ -22,6 +22,45 @@
             document.addEventListener("DOMContentLoaded", function () {
                 const siteName = document.getElementById("site-name");
                 siteName.innerText = window.location.hostname.split(".")[0];
+
+                const form = document.getElementById("subscription-form");
+                const statusEl = document.getElementById("form-status");
+
+                form.addEventListener("submit", async function (e) {
+                    e.preventDefault();
+
+                    const email = form.querySelector('input[name="email"]').value.trim();
+                    const btn = form.querySelector('button[type="submit"]');
+
+                    btn.disabled = true;
+                    btn.textContent = "Subscribing…";
+                    statusEl.textContent = "";
+                    statusEl.className = "mt-2 text-sm";
+
+                    try {
+                        const res = await fetch("/api/subscribe", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email }),
+                        });
+
+                        if (res.ok) {
+                            form.reset();
+                            statusEl.textContent = "You're on the list! We'll let you know when we launch.";
+                            statusEl.classList.add("text-green-400");
+                        } else {
+                            const data = await res.json().catch(() => ({}));
+                            statusEl.textContent = data.error || "Something went wrong. Please try again.";
+                            statusEl.classList.add("text-red-400");
+                        }
+                    } catch {
+                        statusEl.textContent = "Network error. Please try again.";
+                        statusEl.classList.add("text-red-400");
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = "Subscribe";
+                    }
+                });
             });
         </script>
     </head>
@@ -62,6 +101,7 @@
                 <p class="mt-2 text-gray-400 text-sm">
                     Be the first to know when we launch!
                 </p>
+                <p id="form-status" class="mt-2 text-sm"></p>
             </div>
         </div>
     </body>
