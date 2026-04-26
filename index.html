@@ -21,7 +21,7 @@
         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const siteName = document.getElementById("site-name");
-                siteName.innerText = window.location.hostname.split(".")[0];
+                siteName.innerText = window.location.hostname.split(".").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 
                 const form = document.getElementById("subscription-form");
                 const statusEl = document.getElementById("form-status");
