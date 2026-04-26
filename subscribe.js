@@ -1,5 +1,11 @@
 export default {
   async fetch(request, env, ctx) {
+
+    // if the request is not a POST request, return a 405 Method Not Allowed response
+    if (request.method !== "POST") {
+      return Response.json({ error: "Method not allowed! Only POST requests are allowed." }, { status: 405 });
+    }
+
     let body;
     try {
       body = await request.json();
