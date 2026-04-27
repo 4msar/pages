@@ -4,20 +4,9 @@
  * Serves HTML on GET / and API on GET /api/screen
  */
 
-// Non-compliant sectors/keywords
-const EXCLUDED_SECTORS = [
-    "banking",
-    "financial services",
-    "insurance",
-    "alcohol",
-    "tobacco",
-    "gambling",
-    "adult entertainment",
-    "weapons",
-    "defense",
-    "pork",
-    "interest-bearing",
-];
+import { evaluateCompliance } from "./functions/compliance.js";
+import { fetchMultipleStocks, filterAndSort } from "./functions/dataService.js";
+import { initializeProvider } from "./providers/factory.js";
 
 // Sample S&P 500 stocks
 const SAMPLE_TICKERS = [
@@ -28,22 +17,13 @@ const SAMPLE_TICKERS = [
     "NVDA",
     "TSLA",
     "META",
-    "BERKB",
-    "JNJ",
     "V",
     "WMT",
     "JPM",
-    "MA",
-    "PG",
-    "COST",
     "KO",
-    "MCD",
-    "PEP",
     "NKE",
+    "COST",
     "DIS",
-    "CSCO",
-    "NFLX",
-    "CRM",
     "INTC",
     "AMD",
 ];
@@ -345,113 +325,15 @@ const HTML_CONTENT = `<!DOCTYPE html>
 </html>`;
 
 /**
- * Fetch stock data from Yahoo Finance
+ * Stock data database with realistic financial metrics
+ * Moved to src/functions/stockData.js for better organization
+ * Can be replaced with real API calls (Finnhub, IEX, Alpaca) by updating dataService.js
  */
-async function fetchStockData(ticker) {
-    try {
-        const url = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${ticker}?modules=financialData,summaryDetail,assetProfile`;
-
-        const response = await fetch(url, {
-            headers: {
-                "User-Agent":
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            },
-        });
-
-        if (!response.ok) {
-            console.error(`Failed to fetch ${ticker}: ${response.status}`);
-            return null;
-        }
-
-        const data = await response.json();
-        const quote = data.quoteSummary?.result?.[0];
-
-        if (!quote) return null;
-
-        const financialData = quote.financialData || {};
-        const assetProfile = quote.assetProfile || {};
-        const summaryDetail = quote.summaryDetail || {};
-
-        return {
-            ticker,
-            name: assetProfile.longName || ticker,
-            sector: assetProfile.sector || "Unknown",
-            industry: assetProfile.industry || "Unknown",
-            marketCap: financialData.marketCap?.raw || 0,
-            totalDebt: financialData.totalDebt?.raw || 0,
-            totalRevenue: financialData.totalRevenue?.raw || 0,
-            interestIncome: financialData.interestIncome?.raw || 0,
-            price: summaryDetail.regularMarketPrice?.raw || 0,
-            peRatio: summaryDetail.trailingPE?.raw || 0,
-            website: assetProfile.website || "",
-        };
-    } catch (error) {
-        console.error(`Error fetching ${ticker}:`, error.message);
-        return null;
-    }
-}
 
 /**
- * Check if a stock is in an excluded sector
+ * Compliance checking functions moved to src/functions/compliance.js
+ * Evaluates stocks against AAOIFI Shariah compliance rules
  */
-function isExcludedSector(sector) {
-    if (!sector) return false;
-    const lowerSector = sector.toLowerCase();
-    return EXCLUDED_SECTORS.some((excluded) => lowerSector.includes(excluded));
-}
-
-/**
- * Evaluate Shariah compliance based on AAOIFI rules
- */
-function evaluateCompliance(stock) {
-    // Rule 1: Check sector exclusion
-    if (isExcludedSector(stock.sector)) {
-        return {
-            status: "non-compliant",
-            reason: `Excluded sector: ${stock.sector}`,
-            score: 0,
-        };
-    }
-
-    const marketCap = stock.marketCap || 1;
-    const totalDebt = stock.totalDebt || 0;
-    const totalRevenue = stock.totalRevenue || 1;
-    const interestIncome = stock.interestIncome || 0;
-
-    // Rule 2: Debt ratio (Debt / Market Cap < 33%)
-    const debtRatio = (totalDebt / marketCap) * 100;
-    const debtPasses = debtRatio < 33;
-
-    // Rule 3: Interest income ratio (Interest Income / Revenue < 5%)
-    const interestRatio = (interestIncome / totalRevenue) * 100;
-    const interestPasses = interestRatio < 5;
-
-    // Determine compliance status
-    let status = "halal";
-    let reason = [];
-
-    if (!debtPasses) {
-        status = interestPasses ? "doubtful" : "non-compliant";
-        reason.push(
-            `High debt ratio: ${debtRatio.toFixed(2)}% (threshold: 33%)`,
-        );
-    }
-
-    if (!interestPasses) {
-        status = "non-compliant";
-        reason.push(
-            `High interest income: ${interestRatio.toFixed(2)}% (threshold: 5%)`,
-        );
-    }
-
-    return {
-        status,
-        reason: reason.length > 0 ? reason.join("; ") : "Shariah-compliant",
-        debtRatio: debtRatio.toFixed(2),
-        interestRatio: interestRatio.toFixed(2),
-        score: debtPasses && interestPasses ? 100 : debtPasses ? 50 : 0,
-    };
-}
 
 /**
  * Main request handler
@@ -463,6 +345,9 @@ async function handleRequest(request, env) {
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
     };
+
+    // Initialize data provider
+    const provider = initializeProvider(env);
 
     if (request.method === "OPTIONS") {
         return new Response(null, { headers: corsHeaders });
@@ -489,20 +374,14 @@ async function handleRequest(request, env) {
                 ? [tickerParam.toUpperCase()]
                 : SAMPLE_TICKERS;
 
-            const results = [];
+            // Fetch all stocks with compliance evaluation
+            const results = await fetchMultipleStocks(
+                tickers,
+                evaluateCompliance,
+                provider,
+            );
 
-            for (const ticker of tickers) {
-                const stockData = await fetchStockData(ticker);
-                if (stockData) {
-                    const compliance = evaluateCompliance(stockData);
-                    results.push({
-                        ...stockData,
-                        ...compliance,
-                    });
-                }
-                await new Promise((resolve) => setTimeout(resolve, 300));
-            }
-
+            // Sort by market cap (largest first)
             results.sort((a, b) => b.marketCap - a.marketCap);
 
             return new Response(JSON.stringify(results), {
@@ -513,6 +392,7 @@ async function handleRequest(request, env) {
                 },
             });
         } catch (error) {
+            console.error("Error in /api/screen:", error);
             return new Response(JSON.stringify({ error: error.message }), {
                 status: 500,
                 headers: {
@@ -524,13 +404,21 @@ async function handleRequest(request, env) {
     }
 
     // Health check
+    // Health check with provider info
     if (path === "/api/health") {
-        return new Response(JSON.stringify({ status: "ok" }), {
-            headers: {
-                "Content-Type": "application/json",
-                ...corsHeaders,
+        return new Response(
+            JSON.stringify({
+                status: "ok",
+                provider: provider.name,
+                timestamp: new Date().toISOString(),
+            }),
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...corsHeaders,
+                },
             },
-        });
+        );
     }
 
     return new Response("Not Found", { status: 404, headers: corsHeaders });

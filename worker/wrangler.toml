@@ -8,6 +8,14 @@ type = "javascript"
 #  { pattern = "api/*", zone_name = "stock.msar.me" }
 #]
 
-# Environment configuration
+# Environment variables
+[env.development]
+vars = { DATA_PROVIDER = "local" }
+
 [env.production]
 name = "halal-stock-screener-prod"
+vars = { DATA_PROVIDER = "finnhub" }
+
+# Secrets (configure via `wrangler secret put FINNHUB_API_KEY --env production`)
+# [env.production]
+# vars = { FINNHUB_API_KEY = "your-api-key-here" }
