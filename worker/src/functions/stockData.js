@@ -198,3 +198,11 @@ export const STOCK_DATABASE = {
         website: "https://www.amd.com",
     },
 };
+
+/**
+ * Get all available tickers from the database
+ * @returns {string[]} Array of available ticker symbols
+ */
+export function getAllTickers() {
+    return Object.keys(STOCK_DATABASE);
+}

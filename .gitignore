@@ -3,6 +3,7 @@ dist/
 build/
 .DS_Store
 *.env
+**.vars
 *.env.local
 .wrangler/
 .secrets

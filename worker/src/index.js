@@ -7,6 +7,7 @@
 import { evaluateCompliance } from "./functions/compliance.js";
 import { fetchMultipleStocks, filterAndSort } from "./functions/dataService.js";
 import { initializeProvider } from "./providers/factory.js";
+import { getAllTickers } from "./functions/stockData.js";
 
 // Sample S&P 500 stocks
 const SAMPLE_TICKERS = [
@@ -211,7 +212,9 @@ const HTML_CONTENT = `<!DOCTYPE html>
 
     <script>
         const API_URL = '/api/screen';
+        const TICKERS_URL = '/api/tickers';
         let allStocks = [];
+        let availableTickers = [];
 
         function initDarkMode() {
             const isDark = localStorage.getItem('darkMode') === 'true';
@@ -223,6 +226,21 @@ const HTML_CONTENT = `<!DOCTYPE html>
                 const newDark = document.documentElement.classList.contains('dark');
                 localStorage.setItem('darkMode', newDark);
             });
+        }
+
+        async function fetchTickers() {
+            try {
+                const response = await fetch(TICKERS_URL);
+                if (!response.ok) {
+                    throw new Error(\`Failed to fetch tickers: \${response.status}\`);
+                }
+                availableTickers = await response.json();
+                console.log('Available tickers loaded:', availableTickers);
+                return availableTickers;
+            } catch (error) {
+                console.error('Error fetching tickers:', error);
+                return [];
+            }
         }
 
         async function fetchStocks() {
@@ -237,7 +255,14 @@ const HTML_CONTENT = `<!DOCTYPE html>
             emptyState.classList.add('hidden');
 
             try {
-                const response = await fetch(API_URL);
+                // Fetch all available tickers if not already loaded
+                if (availableTickers.length === 0) {
+                    await fetchTickers();
+                }
+                
+                // Fetch stocks for all available tickers
+                const tickersParam = availableTickers.length > 0 ? \`?tickers=\${availableTickers.join(',')}\` : '';
+                const response = await fetch(API_URL + tickersParam);
                 if (!response.ok) {
                     throw new Error(\`API error: \${response.status}\`);
                 }
@@ -319,7 +344,8 @@ const HTML_CONTENT = `<!DOCTYPE html>
         document.getElementById('refreshBtn').addEventListener('click', fetchStocks);
 
         initDarkMode();
-        fetchStocks();
+        // Load tickers first, then fetch stocks
+        fetchTickers().then(() => fetchStocks());
     <\/script>
 </body>
 </html>`;
@@ -366,13 +392,45 @@ async function handleRequest(request, env) {
         });
     }
 
+    // API: Get all available tickers
+    if (path === "/api/tickers") {
+        try {
+            const tickers = getAllTickers();
+            return new Response(JSON.stringify(tickers), {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...corsHeaders,
+                    "Cache-Control": "max-age=86400", // Cache for 24 hours
+                },
+            });
+        } catch (error) {
+            console.error("Error in /api/tickers:", error);
+            return new Response(JSON.stringify({ error: error.message }), {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json",
+                    ...corsHeaders,
+                },
+            });
+        }
+    }
+
     // API: Screen stocks
     if (path === "/api/screen") {
         try {
             const tickerParam = url.searchParams.get("ticker");
-            const tickers = tickerParam
-                ? [tickerParam.toUpperCase()]
-                : SAMPLE_TICKERS;
+            const tickersParam = url.searchParams.get("tickers");
+            let tickers;
+
+            if (tickerParam) {
+                tickers = [tickerParam.toUpperCase()];
+            } else if (tickersParam) {
+                tickers = tickersParam
+                    .split(",")
+                    .map((t) => t.toUpperCase().trim());
+            } else {
+                tickers = getAllTickers();
+            }
 
             // Fetch all stocks with compliance evaluation
             const results = await fetchMultipleStocks(
