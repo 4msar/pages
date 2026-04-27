@@ -2,7 +2,7 @@
 
 A full-stack web app for screening Shariah-compliant stocks using AAOIFI rules.
 
-**Live Demo:** https://halal-stock-screener.workers.dev (after deployment)
+**Live Demo:** https://halal-stock-screener.msar.workers.dev (after deployment)
 
 ## Features
 
@@ -44,75 +44,59 @@ halal-stock-screener/
 
 ### Prerequisites
 
-- Node.js 16+ (for local development)
+- Node.js 16+ installed
+- npm installed
 - Cloudflare account (free tier works)
-- Git (optional)
 
-### 1. Setup Cloudflare Worker
+### 1. Install Dependencies
 
 ```bash
-# Navigate to worker directory
 cd worker
-
-# Install dependencies
 npm install
+```
 
-# Authenticate with Cloudflare
-npx wrangler login
+### 2. Authenticate with Cloudflare
 
-# Deploy to Cloudflare
+```bash
+wrangler login
+```
+
+Follow the prompts to sign in to your Cloudflare account.
+
+### 3. Deploy
+
+```bash
 npm run deploy
 ```
 
-After deployment, you'll get a URL like: `https://halal-stock-screener.YOUR-ACCOUNT.workers.dev`
+**That's it!** 🎉
 
-### 2. Update Frontend URL
+Your app is now live at: `https://halal-stock-screener.YOUR-ACCOUNT.workers.dev`
 
-Edit `public/index.html` and update the API_URL:
+Visit that URL and start screening stocks!
 
-```javascript
-const API_URL =
-    "https://halal-stock-screener.YOUR-ACCOUNT.workers.dev/api/screen";
-```
+### Test Locally (Optional)
 
-### 3. Deploy Frontend
-
-Choose one of these options:
-
-#### Option A: Cloudflare Pages (Recommended)
+Before deploying, test locally:
 
 ```bash
-# Install Wrangler CLI
-npm install -g wrangler
-
-# Deploy the public folder
-wrangler pages deploy public
-```
-
-#### Option B: GitHub Pages
-
-1. Push to GitHub
-2. Enable Pages in repository settings
-3. Set root to `/public`
-
-#### Option C: Vercel, Netlify, or any static host
-
-Simply upload the `public/index.html` file.
-
-### 4. Test Locally (Optional)
-
-```bash
-cd worker
 npm run dev
 ```
 
-Visit: http://localhost:8787
+Visit: `http://localhost:8787`
 
-Then update `public/index.html` to use `http://localhost:8787/api/screen`
+## How It Works
 
-## API Endpoints
+**Everything is in one Cloudflare Worker!**
 
-### GET /api/screen
+1. Browser requests `/` → Worker serves HTML frontend
+2. Frontend JavaScript makes API calls to `/api/screen`
+3. Worker backend fetches stock data from Yahoo Finance
+4. Results are screened for Shariah compliance
+5. JSON response sent back to frontend
+6. Frontend displays results with search/filter/sort
+
+No separate frontend hosting needed. Single deployment. Single URL.
 
 Fetches and screens stocks for Shariah compliance.
 
@@ -170,7 +154,7 @@ Fetches and screens stocks for Shariah compliance.
 
 ### Add More Stocks
 
-Edit `worker/src/index.js` and update the `SAMPLE_TICKERS` array:
+Edit `worker/src/index.js` and find the `SAMPLE_TICKERS` array:
 
 ```javascript
 const SAMPLE_TICKERS = [
@@ -183,29 +167,41 @@ const SAMPLE_TICKERS = [
 ];
 ```
 
+Then deploy:
+
+```bash
+cd worker
+npm run deploy
+```
+
 ### Adjust Thresholds
 
-In `worker/src/index.js`, modify the compliance function:
+In `worker/src/index.js`, find the `evaluateCompliance()` function and modify:
 
 ```javascript
 const debtRatio = (totalDebt / marketCap) * 100;
-const debtPasses = debtRatio < 33; // Change threshold here
+const debtPasses = debtRatio < 33; // Change 33 to your threshold
 
 const interestRatio = (interestIncome / totalRevenue) * 100;
-const interestPasses = interestRatio < 5; // Change threshold here
+const interestPasses = interestRatio < 5; // Change 5 to your threshold
 ```
 
-### Add More Sectors
+Then deploy the changes.
 
-Edit `EXCLUDED_SECTORS` array in `worker/src/index.js`:
+### Add More Excluded Sectors
+
+Edit the `EXCLUDED_SECTORS` array in `worker/src/index.js`:
 
 ```javascript
 const EXCLUDED_SECTORS = [
     "banking",
     "financial services",
+    "insurance",
     // Add more sectors
 ];
 ```
+
+Then deploy.
 
 ## Performance & Caching
 
@@ -258,15 +254,17 @@ npm run deploy
 
 ## Deployment Checklist
 
-- [ ] Node.js and npm installed
+- [ ] Node.js 16+ and npm installed
 - [ ] Cloudflare account created
-- [ ] `wrangler` authenticated
-- [ ] Worker deployed (`npm run deploy`)
-- [ ] Frontend URL updated with correct Worker URL
-- [ ] Frontend deployed (Pages, GitHub Pages, or other host)
-- [ ] Test with real stocks
-- [ ] Dark mode tested
-- [ ] Mobile responsiveness verified
+- [ ] `cd worker && npm install`
+- [ ] `wrangler login` (authenticated)
+- [ ] `npm run deploy` (worker deployed)
+- [ ] Visit your worker URL
+- [ ] Test: Click "🔄 Refresh Data"
+- [ ] Test: Search for a stock
+- [ ] Test: Toggle dark mode
+- [ ] Test: Filter and sort results
+- [ ] Share your worker URL!
 
 ## License
 
