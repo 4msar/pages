@@ -113,4 +113,20 @@ export async function fetchStockData(ticker) {
     }
 }
 
+/**
+ * Get all available tickers from mock data
+ * @returns {Promise<string[]>} Array of available ticker symbols
+ */
+export async function getAvailableTickers() {
+    try {
+        return Object.keys(MOCK_STOCKS);
+    } catch (error) {
+        console.error(
+            "Error getting available tickers from mock provider:",
+            error.message,
+        );
+        return [];
+    }
+}
+
 export const providerName = "mock";

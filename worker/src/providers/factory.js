@@ -70,6 +70,13 @@ export function initializeProvider(env) {
             }
             return provider.fetchStockData(ticker);
         },
+        getAvailableTickers: () => {
+            const apiKey = apiKeyMap[providerName];
+            if (apiKey) {
+                return provider.getAvailableTickers(apiKey);
+            }
+            return provider.getAvailableTickers();
+        },
     };
 }
 

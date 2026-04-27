@@ -111,3 +111,60 @@ function estimateInterestIncome(sector) {
 }
 
 export const providerName = "finnhub";
+
+/**
+ * Get available tickers from Finnhub
+ * Uses a default list of popular stocks to avoid excessive API calls
+ * For a complete list, query https://finnhub.io/api/v1/stock/list?exchange=US&token=YOUR_API_KEY
+ * @param {string} apiKey - Finnhub API key (optional)
+ * @returns {Promise<string[]>} Array of available ticker symbols
+ */
+export async function getAvailableTickers(apiKey) {
+    try {
+        // Default list of popular US stocks
+        // If you need a dynamic list, uncomment and configure the API call below
+        const defaultTickers = [
+            "AAPL",
+            "MSFT",
+            "GOOGL",
+            "AMZN",
+            "NVDA",
+            "TSLA",
+            "META",
+            "V",
+            "WMT",
+            "JPM",
+            "KO",
+            "NKE",
+            "COST",
+            "DIS",
+            "INTC",
+            "AMD",
+        ];
+
+        // Uncomment below to fetch dynamic list from Finnhub API
+        // Warning: This uses one API call per request
+        if (apiKey) {
+            const url = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${apiKey}`;
+            const response = await fetch(url, {
+                cf: { cacheTtl: 86400, cacheEverything: true }, // Cache for 24 hours
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                return data
+                    .filter((item) => item.symbol && !item.symbol.includes("."))
+                    .map((item) => item.symbol)
+                    .slice(0, 100); // Limit to first 100 stocks
+            }
+        }
+
+        return defaultTickers;
+    } catch (error) {
+        console.error(
+            "Error getting available tickers from Finnhub:",
+            error.message,
+        );
+        return [];
+    }
+}

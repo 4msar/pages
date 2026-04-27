@@ -115,3 +115,41 @@ function estimateInterestIncome(industry) {
 }
 
 export const providerName = "polygon";
+
+/**
+ * Get available tickers from Polygon.io
+ * Uses a default list of popular stocks to avoid excessive API calls
+ * @param {string} apiKey - Polygon.io API key (optional)
+ * @returns {Promise<string[]>} Array of available ticker symbols
+ */
+export async function getAvailableTickers(apiKey) {
+    try {
+        // Default list of popular US stocks
+        const defaultTickers = [
+            "AAPL",
+            "MSFT",
+            "GOOGL",
+            "AMZN",
+            "NVDA",
+            "TSLA",
+            "META",
+            "V",
+            "WMT",
+            "JPM",
+            "KO",
+            "NKE",
+            "COST",
+            "DIS",
+            "INTC",
+            "AMD",
+        ];
+
+        return defaultTickers;
+    } catch (error) {
+        console.error(
+            "Error getting available tickers from Polygon.io:",
+            error.message,
+        );
+        return [];
+    }
+}

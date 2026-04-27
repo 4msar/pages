@@ -112,3 +112,41 @@ function estimateInterestIncome(sector) {
 }
 
 export const providerName = "alphavantage";
+
+/**
+ * Get available tickers from Alpha Vantage
+ * Uses a default list of popular stocks to avoid excessive API calls
+ * @param {string} apiKey - Alpha Vantage API key (optional)
+ * @returns {Promise<string[]>} Array of available ticker symbols
+ */
+export async function getAvailableTickers(apiKey) {
+    try {
+        // Default list of popular US stocks
+        const defaultTickers = [
+            "AAPL",
+            "MSFT",
+            "GOOGL",
+            "AMZN",
+            "NVDA",
+            "TSLA",
+            "META",
+            "V",
+            "WMT",
+            "JPM",
+            "KO",
+            "NKE",
+            "COST",
+            "DIS",
+            "INTC",
+            "AMD",
+        ];
+
+        return defaultTickers;
+    } catch (error) {
+        console.error(
+            "Error getting available tickers from Alpha Vantage:",
+            error.message,
+        );
+        return [];
+    }
+}

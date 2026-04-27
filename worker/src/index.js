@@ -7,7 +7,6 @@
 import { evaluateCompliance } from "./functions/compliance.js";
 import { fetchMultipleStocks, filterAndSort } from "./functions/dataService.js";
 import { initializeProvider } from "./providers/factory.js";
-import { getAllTickers } from "./functions/stockData.js";
 
 // Sample S&P 500 stocks
 const SAMPLE_TICKERS = [
@@ -395,7 +394,7 @@ async function handleRequest(request, env) {
     // API: Get all available tickers
     if (path === "/api/tickers") {
         try {
-            const tickers = getAllTickers();
+            const tickers = await provider.getAvailableTickers();
             return new Response(JSON.stringify(tickers), {
                 headers: {
                     "Content-Type": "application/json",
@@ -429,7 +428,8 @@ async function handleRequest(request, env) {
                     .split(",")
                     .map((t) => t.toUpperCase().trim());
             } else {
-                tickers = getAllTickers();
+                // Get all available tickers from provider
+                tickers = await provider.getAvailableTickers();
             }
 
             // Fetch all stocks with compliance evaluation

@@ -33,4 +33,20 @@ export async function fetchStockData(ticker) {
     }
 }
 
+/**
+ * Get all available tickers from local database
+ * @returns {Promise<string[]>} Array of available ticker symbols
+ */
+export async function getAvailableTickers() {
+    try {
+        return Object.keys(STOCK_DATABASE);
+    } catch (error) {
+        console.error(
+            "Error getting available tickers from local database:",
+            error.message,
+        );
+        return [];
+    }
+}
+
 export const providerName = "local";
